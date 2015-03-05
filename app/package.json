@@ -1,0 +1,22 @@
+{
+  "name": "gispatch",
+  "prettyName": "Gispatch",
+  "description": "Dispatch node apps directly from git urls.",
+  "version": "0.1.0",
+  "author": "Matt Wisniewski <contact.mattdylan@gmail.com>",
+  "main": "index.html",
+  "window": {
+    "icon": "icon.png",
+    "show": true,
+    "frame": false,
+    "toolbar": false,
+    "width": 1000,
+    "height": 600,
+    "min_width": 800,
+    "min_height": 400,
+    "position": "center"
+  },
+  "dependencies": {
+    "ssh2": "^0.4.4"
+  }
+}

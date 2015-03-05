@@ -1,0 +1,38 @@
+#status-bar{
+    position:absolute;
+    bottom:0;
+    height:2em;
+    right:0;
+    left:13.4em;
+    background:@dark-gray;
+    border-top:1px solid @darker-gray;
+
+    #loading{
+        width:2em;
+        height:2em;
+        color:@subtle;
+        float:left;
+        i{
+            padding:.5em;
+        }
+
+    }
+    #version{
+        position:absolute;
+        right:1em;
+        top:.6em;
+        color:@subtle;
+        font-size:10pt;
+    }
+    #status{
+        color:@subtle;
+        float:left;
+        height:2em;
+        width:calc(100% - 5em);
+        p{
+            padding:.6em;
+            font-size:10pt;
+            margin:0;
+        }
+    }
+}

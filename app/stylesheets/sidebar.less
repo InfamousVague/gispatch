@@ -1,0 +1,50 @@
+#sidebar{
+    position:absolute;
+    left:0;
+    z-index:1;
+    width:13.4em;
+    background:@dark-gray;
+    border-right:1px solid @darker-gray;
+    bottom:0;
+    top:3.4em;
+
+    ul{
+        list-style-type:none;
+        padding:0;
+        width:100%;
+
+        .active{
+            box-shadow:inset -5px 0 0 @light-green;
+            color:@white;
+            background:rgba(0,0,0,.1);
+
+            a{
+                color:@white;
+            }
+        }
+        li{
+            width:100%;
+            position:relative;
+
+            a{
+                display:block;
+                width:cacl(100% - 1em);
+                font-size:12pt;
+                padding:.5em;
+                color:@subtle;
+
+                &:hover{
+                    border-right:5px solid @light-green;
+                    color:@white;
+                }
+                i{
+                    width:2em;
+                    text-align:center;
+
+                }
+
+                text-decoration:none;
+            }
+        }
+    }
+}
