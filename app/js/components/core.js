@@ -18,14 +18,13 @@ export var checkError = function(err){
 }
 
 export var generateConfig = function(user, host, pass){
-    var file = "";
-    file += 'export var InitConfig = {\n';
+    var file = '{\n';
     file += '"user": "' + user + '",\n';
     file += '"host": "' + host + '",\n';
     file += '"pass": "' + pass + '"\n';
-    file += '};';
+    file += '}';
     var fs = require('fs');
-    fs.writeFile('./config.js', file, function (err) {
+    fs.writeFile('./config.json', file, function (err) {
       if (err) throw err;
 
     });

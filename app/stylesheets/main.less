@@ -34,6 +34,8 @@ html, body {
 @import 'frame';
 @import 'terminal';
 @import 'connect';
+@import 'deploy';
+@import 'running';
 
 body{
     background:@gray;
@@ -49,7 +51,7 @@ input{
     color:@subtle;
 }
 ::-webkit-input-placeholder { /* WebKit browsers */
-    color: @dark-gray;
+    color: @gray;
 }
 :focus {
   outline-color: transparent;
@@ -95,5 +97,28 @@ label{
     }
     &:active{
         background:rgb(155,0,0);
+    }
+}
+
+
+.btn{
+    color:@white;
+    border:none;
+    font-size:12pt;
+    padding:.5em .5em;
+    float:left;
+    margin:0;
+    margin-right:-1em;
+    border-radius:2px;
+    width:90%;
+}
+.btn-orange{
+    background:#e67e22;
+
+    &:hover{
+        background:#f39c12;
+    }
+    &:active{
+        background:#e67e22;
     }
 }

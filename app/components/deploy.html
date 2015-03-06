@@ -1,0 +1,17 @@
+<div id="deploy">
+    <div class="center">
+        <h2>Deploy an app:</h2>
+        <p>enter the ssh connection information for your server.</p>
+        <label>Git URL:</label><br>
+        <input id="git-url" placeholder="https://github.com/wski/gispatch.git" /><br>
+        <span class="small">(e.g. https://github.com/wski/gispatch.git)</span>
+        <br><br>
+        <label>Entry Point:</label><br>
+        <input id="entry-point" placeholder="app/myapp.js" />
+        <span class="small">(e.g. app/myapp.js)</span><br>
+        <span class="small">your application will deploy using forever, once deployed
+        you can check the status in the 'Running Apps' tab.</span>
+        <br><br>
+        <button id="deploy-btn" class="btn-green dark-green">Deploy!</button>
+    </div>
+</div>

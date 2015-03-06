@@ -3,66 +3,105 @@ import { statusbar } from './js/components/statusbar';
 import { sidebar } from './js/components/sidebar';
 import { execute } from './js/components/execute';
 import {
-    msgDisplay, generateConfig, startLoading, stopLoading, checkError
-    } from './js/components/core';
+            msgDisplay, generateConfig, startLoading,
+            stopLoading, checkError
+        } from './js/components/core';
+
 import { connect } from './js/components/connect';
+import { ssh_execute } from './js/components/ssh_connect';
+import { checkRunning } from './js/components/check_running';
 
-import { InitConfig } from './config';
+var Config = {
+    "user": "notsetup",
+    "host": "notsetup",
+    "pass": "notsetup"
+};
+$.getJSON( "./config.json", function( data ) {
+    Config = data;
+}).fail(function() {
+    Config = {
+        "user": "notsetup",
+        "host": "notsetup",
+        "pass": "notsetup"
+    };
+});
 
-var ConfigString = JSON.stringify(InitConfig);
-var Config = JSON.parse(ConfigString);
+
+var checkConfig = function(){
+    if ( Config.user.toString() != "notsetup"){
+        setTimeout(function(){
+            $('#user').val(Config.user);
+            $('#host').val(Config.host);
+            $('#pass').val(Config.pass);
+        }, 50);
+
+        startLoading();
+        ssh_execute(Config, 'echo "connected successfully"', function(response){
+            msgDisplay('normal', response.toString());
+            stopLoading();
+            $('#conn').html('success!');
+            $('#conn').removeClass('btn-red');
+        });
+    }else{
+        $('#frame').load('components/connect.html');
+    }
+};
+
+setTimeout(function(){
+    $('#frame').load('components/deploy.html');
+    checkConfig();
+}, 500);
+
 
 process.on('uncaughtException', function(err) {
     msgDisplay('error', err.toString());
     checkError(err);
 });
 
-var Client = require('ssh2').Client;
-var conn = new Client();
-var ssh_connect = function(command, callback){
-    conn.on('ready', function() {
-      callback('Client :: ready');
-      conn.exec(command, function(err, stream) {
-        if (err) throw err;
-        stream.on('close', function(code, signal) {
-          conn.end();
-        }).on('data', function(data) {
-          callback(data);
-        }).stderr.on('data', function(data) {
-          callback(data);
-        });
-      });
-    }).connect({
-      host: Config.host,
-      port: 22,
-      username: Config.user,
-      password: Config.pass
-    });
-}
 
-
-// SSH
-var ssh_execute = function(command, callback){
-    var exec_conn = new Client();
-    exec_conn.on('ready', function() {
-        exec_conn.exec(command, function(err, stream) {
-        if (err) throw err;
-        stream.on('close', function(code, signal) {
-            exec_conn.end();
+$(document).on('click', '.stop', function(e){
+    e.preventDefault();
+    var command = "forever stop " + $(this).data('pid');
+    ssh_execute(Config, command, function(data){
+        msgDisplay('basic', data.toString());
+        checkRunning(Config, function(options){
             stopLoading();
-        }).on('data', function(data) {
-            callback(data);
-        }).stderr.on('data', function(data) {
-            callback(data);
         });
-      });
-    }).connect({
-      host: Config.host,
-      port: 22,
-      username: Config.user,
-      password: Config.pass
     });
-};
+});
+
+$(document).on('click', '.restart', function(e){
+    e.preventDefault();
+    var command = "forever restart " + $(this).data('pid');
+    ssh_execute(Config, command, function(data){
+        msgDisplay('basic', data.toString());
+        checkRunning(Config, function(options){
+            stopLoading();
+        });
+    });
+});
+
+$(document).on('click', '#deploy-btn', function(e){
+    e.preventDefault();
+    startLoading();
+    var gitRepo = $('#git-url').val();
+    var application = gitRepo.match(/\/([^/]*)$/)[1];
+    var trimmedApplication = application.substring(0, application.length - 4);
+    var entryPoint = $('#entry-point').val();
+
+    var ssh_cmd = "git clone " + gitRepo + " && forever start " + trimmedApplication + "/" + entryPoint;
+
+    ssh_execute(Config, ssh_cmd, function(data){
+        msgDisplay('basic', data.toString());
+        stopLoading();
+
+        $('#deploy-btn').html('Success!');
+    });
+
+    setTimeout(function(){
+        $('#deploy-btn').html('Deploy!');
+    }, 1500);
+});
 
 $(document).on('click', '#ssh_exec', function(e){
     e.preventDefault();
@@ -70,14 +109,15 @@ $(document).on('click', '#ssh_exec', function(e){
     var ssh_cmd = $('#ssh_cmd').val().replace(' ', '\u0020') + '\u0020';
 
     $('#term').append('> ' + ssh_cmd.toString() + '<br>');
-    ssh_execute(ssh_cmd, function(data){
+    ssh_execute(Config, ssh_cmd, function(data){
         $('#term').append(data.toString() + '<br>');
+        stopLoading();
     });
 });
 
 var testCommand = function(){
     startLoading();
-    ssh_connect('echo "connected successfully"', function(response){
+    ssh_execute(Config, 'echo "connected successfully"', function(response){
         msgDisplay('normal', response.toString());
         stopLoading();
         $('#conn').html('success!');
@@ -86,41 +126,31 @@ var testCommand = function(){
 };
 
 var ready = function(){
-    var checkConfig = function(){
-        if ( Config.user.toString() != "notsetup"){
-            setTimeout(function(){
-                $('#user').val(Config.user);
-                $('#host').val(Config.host);
-                $('#pass').val(Config.pass);
-            }, 50);
-
-            startLoading();
-            ssh_connect('echo "connected successfully"', function(response){
-                msgDisplay('normal', response.toString());
-                stopLoading();
-                $('#conn').html('success!');
-                $('#conn').removeClass('btn-red');
-            });
-        }else{
-            $('#frame').load('components/connect.html');
-        }
-    };
-    checkConfig();
     $(document).on('click', '#sidebar a', function(){
         $('#sidebar li').removeClass('active');
         $(this).parent().addClass('active');
-        $('#frame').html('');
+        $('#frame').html(' ');
         switch ($(this).data('module')){
             case 'connect':
                 $('#frame').load('components/connect.html');
                 $(document).ready(function(){
                     checkConfig();
                 });
-
                 break;
+
             case 'terminal':
                 $('#frame').load('components/terminal.html');
+                break;
 
+            case 'deploy':
+                $('#frame').load('components/deploy.html');
+                break;
+
+            case 'running-apps':
+                $('#frame').load('components/running.html');
+                checkRunning(Config, function(options){
+
+                });
                 break;
         }
     });
