@@ -18,6 +18,7 @@ var Config = {
 };
 $.getJSON( "./config.json", function( data ) {
     Config = data;
+    Config.pass = atob(Config.pass);
 }).fail(function() {
     Config = {
         "user": "notsetup",
@@ -161,7 +162,7 @@ $(document).on('click', '#conn', function(e){
     var user = String(document.getElementById('user').value);
     var host = String(document.getElementById('host').value);
     var pass = String(document.getElementById('pass').value);
-    generateConfig(user, host, pass);
+    generateConfig(user, host, btoa(pass));
 
     // Generate a temporary file
     var file = "";
