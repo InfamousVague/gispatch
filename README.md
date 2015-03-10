@@ -1,3 +1,6 @@
+# WARNING: DO NOT USE THIS APPLICATION AT THE MOMENT! THERE IS A KNOWN SECURITY RISK OPENING YOUR SERVER TO A POTENTIAL BOTNET HIJACKING!!!!
+
+
 # Gispatch
 Gispatch makes it easy to deploy Nodejs applications directly from git urls.
 
